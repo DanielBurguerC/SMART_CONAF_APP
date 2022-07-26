@@ -11,3 +11,7 @@ library(rgdal)
 library(raster)
 library(geojsonsf)
 library(sf)
+#remotes::install_github("Displayr/flipTime")
+library(flipTime)
+library(units)
+

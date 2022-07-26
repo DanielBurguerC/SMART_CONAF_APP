@@ -334,10 +334,10 @@ function(input, output, session) {
   output$Grafico_kms <- renderPlotly({
     unidad <- input$Unidades
     unidad <- unique(inputs[inputs$UNIDAD %in% unidad,]$COD)
-    # unidad <- c("RNPT","PNVI");ano <- 2020
+    # unidad <- "PNVI";ano <- 2020
     ano <- input$Anos
     anos <- unique(inputs$ANO)
-    data <- tracks_data@data
+    data <- tracks_data
     filtro <- data[data$conservation_area_id %in% unidad,]
     filtro$ano <- as.numeric(as.character(filtro$ano))
     filtro$Patrol_Transport_Type <- as.character(filtro$Patrol_Transport_Type)
@@ -386,100 +386,41 @@ function(input, output, session) {
   
   
   
-  # observeEvent(input$Unidades, ignoreNULL = F, {
-  #   if (is.null(input$Unidades)){
-  #     leafletProxy("map") %>% clearImages() %>% clearTiles() %>%
-  #       clearControls() %>% addTiles()
-  #   } else {
-  #     unidad <- input$Unidades
-  #     cod<- inputs[inputs$UNIDAD %in% unidad,]
-  #     # cod2 <- c("PNVI","RNPT")
-  #     cod2<- unique(cod$COD)
-  #     ano <- input$Anos
-  #     # cod2 <- c("PNVI","RNTP")
-  #     # ano <- 2021
-  #     #buscar un archivo raster para crear un raster vacio
-  #     archivo <- paste0("www/cache/",as.character(ano),"/",cod2[1],"/heat_track/heat_track.tif")
-  #     raster <-raster(archivo)
-  #     raster[] <- NA
-  #     
-  #     
-  #     #si hay mas de 1 codigo de unidad entrar en loop para crear mosaico
-  #     if (length(cod2)>1) {
-  #       unidades_tracks <-  tracks_data[tracks_data$ano==ano,]
-  #       if (length(unique(unidades_tracks$conservation_area_id)) < length(cod2)) {
-  #         
-  #         for (i in unique(unidades_tracks$COD)) {
-  #           archivo <- paste0("www/cache/",as.character(ano),"/",i,"_heat_track.tif")
-  #           raster_2 <- raster(archivo)
-  #           raster <- raster::merge(raster, raster_2, tolerance = 1)
-  #         }
-  #         
-  #         args <- paste(cod2,collapse="_")
-  #         nombre_archivo <-  paste0("www/cache/",as.character(ano),"/heat_tracks_unidos/",args,"_heat_track.tif")
-  #         
-  #         if (file.exists(nombre_archivo)){
-  #           raster <- raster(nombre_archivo)
-  #         } else {
-  #           
-  #           args <- paste(cod2,collapse="_")
-  #           
-  #           writeRaster(raster, filename=nombre_archivo, overwrite=TRUE)
-  #           raster <- raster(nombre_archivo)
-  #         }
-  #         
-  #       } else {
-  #         
-  #         for (i in unique(unidades_tracks$conservation_area_id)) {
-  #           archivo <- paste0("www/cache/",as.character(ano),"/",i,"/heat_track/heat_track.tif")
-  #           raster_2 <- raster(archivo)
-  #           raster <- raster::merge(raster, raster_2, tolerance = 1)
-  #         }
-  #         
-  #         args <- paste(cod2,collapse="_")
-  #         nombre_archivo <-  paste0("www/cache/",as.character(ano),"/heat_tracks_unidos/",args,"_heat_track.tif")
-  #         
-  #         if (file.exists(nombre_archivo)){
-  #           raster <- raster(nombre_archivo)
-  #         } else {
-  #           
-  #           dir.create(paste0("www/cache/",as.character(ano),"/heat_tracks_unidos/"))
-  #           writeRaster(raster, filename=nombre_archivo, overwrite=TRUE)
-  #           raster <- raster(nombre_archivo)
-  #         }
-  #         
-  #       }
-  #     } else {
-  #       archivo <- paste0("www/cache/",as.character(ano),"/",cod2,"/heat_track/heat_track.tif")
-  #       raster <-raster(archivo)
-  #     }
-  #     
-  #     
-  #     
-  #     viridis <- c("#440154FF","#481567FF","#482677FF","#453781FF","#404788FF",
-  #                  "#39568CFF","#33638DFF","#2D708EFF","#287D8EFF","#238A8DFF",
-  #                  "#1F968BFF","#20A387FF","#29AF7FFF","#3CBB75FF","#55C667FF",
-  #                  "#73D055FF","#95D840FF","#B8DE29FF","#DCE319FF","#FDE725FF")
-  #     pal1 <- colorNumeric(inlmisc::GetTolColors(256, start = 0.5, end = 1.0), raster::values(raster), na.color = "transparent")
-  #     
-  #     leafletProxy("map",data = raster ) %>% clearImages() %>% clearTiles() %>%
-  #       clearControls() %>% addTiles() %>%
-  #       addRasterImage(
-  #         raster,
-  #          group = "Mapa de calor",
-  #          opacity = 1,
-  #          colors = pal1) %>%
-  #       addLayersControl(overlayGroups = c("Mapa de calor", "Limites")) %>%
-  #       leaflet::addLegend(
-  #         position = c("topleft"),
-  #         pal = pal1,
-  #         values = raster::values(raster),
-  #         title = paste0("Densidad de muestreo"))
-  #     
-  #     
-  #   }
-  # }
-  # )
+  observeEvent(input$Unidades, ignoreNULL = F,{
+    
+    if (nchar(input$Unidades) < 1) {
+      leafletProxy("map") %>% clearImages() %>% clearTiles() %>%
+        clearControls() %>% addTiles()
+    } else {
+      # unidad <- "Parque Nacional Volcan Isluga"; ano <- 2021
+      unidad <- input$Unidades
+      cod<- unique(inputs[inputs$UNIDAD %in% unidad,]$COD)
+      ano <- input$Anos
+      
+      #buscar un archivo raster para crear un raster vacio
+      archivo <- paste0("www/cache/",ano,"/",cod,"/heat_track/heat_track.tif")
+      raster <-raster(archivo)
+      viridis <- c("#440154FF","#481567FF","#482677FF","#453781FF","#404788FF",
+                   "#39568CFF","#33638DFF","#2D708EFF","#287D8EFF","#238A8DFF",
+                   "#1F968BFF","#20A387FF","#29AF7FFF","#3CBB75FF","#55C667FF",
+                   "#73D055FF","#95D840FF","#B8DE29FF","#DCE319FF","#FDE725FF")
+      pal1 <- colorNumeric(inlmisc::GetTolColors(256, start = 0.5, end = 1.0), raster::values(raster), na.color = "transparent")
+      leafletProxy("map",data = raster ) %>% clearImages() %>% clearTiles() %>%
+        clearControls() %>% addTiles() %>%
+        addRasterImage(
+          raster,
+           group = "Mapa de calor",
+           opacity = 1,
+           colors = pal1) %>%
+        addLayersControl(overlayGroups = c("Mapa de calor", "Limites")) %>%
+        leaflet::addLegend(
+          position = c("topleft"),
+          pal = pal1,
+          values = raster::values(raster),
+          title = paste0("Densidad de muestreo"))
+    }
+  }
+  )
   
   observeEvent(input$boton1, {
     unidad <- input$Unidades
