@@ -1,0 +1,13 @@
+#Librerias
+library(shiny)
+library(bs4Dash)
+library(vroom)
+library(tidyr)
+library(tidyverse)
+library(dplyr)
+library(leaflet)
+library(plotly)
+library(rgdal)
+library(raster)
+library(geojsonsf)
+library(sf)
