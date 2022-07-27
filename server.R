@@ -481,4 +481,9 @@ function(input, output, session) {
       write.csv(descarga(), fname)
     }
   )
+  
+  
+  output$map_2 <- renderLeaflet({
+    leaflet() %>% addTiles()
+  })
 }

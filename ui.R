@@ -49,17 +49,13 @@ ui = dashboardPage(
       ),
       tabItem(
         tabName = "tab2",
-        checkboxGroupInput(
-          "variable", "Escoja las variables que desee en el informe:",
-          c(
-            "Datos de Fauna" = "cyl",
-            "Datos de Amenaza" = "am",
-            "Datos de Fauna Muerta" = "gear"
-          )
+        fluidRow(column(width = 6,selectInput("Especie",choices = c(Seleccione=""),label = "Seleccione especie:")),
+                 column(width = 6,selectInput("Amenaza",choices = c(Seleccione=""),label = "Seleccione amenaza:"))),
+        fluidRow(leafletOutput("map_2", width = "100%")),
         ),
         tableOutput("data")
       )
-    )
+    
   ),
   sidebar = dashboardSidebar(
     skin = "light",
